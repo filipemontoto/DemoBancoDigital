@@ -1,32 +1,33 @@
-﻿using BancoDigital.Classes;
-using BancoDigital.Interfaces;
+﻿using BancoDigital.Interfaces;
+using BancoDigital.Repository;
 using BancoDigital.Repository.MongoDBModels;
-using MongoDB.Driver;
 
 namespace BancoDigital.Services
 {
     public class ContaBancoDigitalService : IContaBancoDigital
     {
-        private MongoDbService _MongoDbContaBancoDigitalService;
+        private ContaBancoDigitalRepository _ContaBancoDigitalRepository;
 
-        public ContaBancoDigitalService(MongoDbService contaBancoDigitalService)
+        public ContaBancoDigitalService(ContaBancoDigitalRepository contaBancoDigitalService)
         {
-            _MongoDbContaBancoDigitalService = contaBancoDigitalService;
+            _ContaBancoDigitalRepository = contaBancoDigitalService;
         }
 
         public SaldoPayload GetContaBancoDigital(
             int conta)
         {
-
-            var contaMongoDb = _MongoDbContaBancoDigitalService.GetMongoDbContaBancoDigital(conta);
+            // Busca se conta existe em banco de dados, a partir de input da API
+            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(conta);
 
             // Caso não exista, devolve erro
             if (contaMongoDb == null)
             {
+                // Está sendo utilizado uma forma nativa de devolver erros para o usuário
+                // Apenas é necessário escolher um Código e uma Mensagem de retorno
                 throw new GraphQLException(
                     ErrorBuilder
                         .New()
-                        .SetMessage("Consulta inválida - Conta inexistente.")
+                        .SetMessage("Solicitação inválida - Conta inexistente.")
                         .SetCode("-1")
                         .Build());
             }
@@ -39,13 +40,13 @@ namespace BancoDigital.Services
         public ContaBancoDigitalPayload CreateContaBancoDigital(
             CreateContaInput input)
         {
-
-            var contaMongoDb = _MongoDbContaBancoDigitalService.GetMongoDbContaBancoDigital(input.Conta);
+            // Busca se conta existe em banco de dados, a partir de input da API
+            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, cria e devolve os dados da nova conta
             if (contaMongoDb == null)
             {
-                return new ContaBancoDigitalPayload(_MongoDbContaBancoDigitalService.InsertMongoDbContaBancoDigital(input));
+                return new ContaBancoDigitalPayload(_ContaBancoDigitalRepository.InsertMongoDbContaBancoDigital(input));
             }
 
             // Caso já exista uma conta com esse código, vamos devolver a conta já criada
@@ -56,85 +57,92 @@ namespace BancoDigital.Services
         public ContaBancoDigitalPayload DeletarContaBancoDigital(
             CreateContaInput input)
         {
-            var contaMongoDb = _MongoDbContaBancoDigitalService.GetMongoDbContaBancoDigital(input.Conta);
+            // Busca se conta existe em banco de dados, a partir de input da API
+            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, devolve erro
             if (contaMongoDb == null)
             {
+                // Está sendo utilizado uma forma nativa de devolver erros para o usuário
+                // Apenas é necessário escolher um Código e uma Mensagem de retorno
                 throw new GraphQLException(
                     ErrorBuilder
                         .New()
-                        .SetMessage("Solicitação de deleção de uma conta inexistente.")
+                        .SetMessage("Solicitação inválida - Conta inexistente.")
                         .SetCode("-1")
                         .Build());
             }
 
-            var conta = new MongoDbContaBancoDigital()
-            {
-                Id = contaMongoDb.Id,
-                Conta = contaMongoDb.Conta,
-                Saldo = contaMongoDb.Saldo,
-            };
+            // Caso sucesso até aqui, só precisamos iniciar a deleção da conta, que não precisa retornar nada
+            _ContaBancoDigitalRepository.DeleteMongoDbContaBancoDigital(contaMongoDb.Id);
 
-            _MongoDbContaBancoDigitalService.DeleteMongoDbContaBancoDigital(contaMongoDb.Id);
-
-            return new ContaBancoDigitalPayload(conta);
+            return new ContaBancoDigitalPayload(contaMongoDb);
         }
 
         public ContaBancoDigitalPayload DepositarContaBancoDigital(ValorContaInput input)
         {
-            var contaMongoDb = _MongoDbContaBancoDigitalService.GetMongoDbContaBancoDigital(input.Conta);
+            // Busca se conta existe em banco de dados, a partir de input da API
+            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
-            var conta = new MongoDbContaBancoDigital()
+            // Caso não exista, devolve erro
+            if (contaMongoDb == null)
             {
-                Id = contaMongoDb.Id,
-                Conta = contaMongoDb.Conta,
-                Saldo = contaMongoDb.Saldo,
-            };
-
-            conta.Saldo += input.Valor;
-
-            if (conta.Saldo < 0)
-            {
+                // Está sendo utilizado uma forma nativa de devolver erros para o usuário
+                // Apenas é necessário escolher um Código e uma Mensagem de retorno
                 throw new GraphQLException(
                     ErrorBuilder
                         .New()
-                        .SetMessage("Saldo insuficiente para esse valor de saque.")
+                        .SetMessage("Solicitação inválida - Conta inexistente.")
                         .SetCode("-1")
                         .Build());
             }
 
-            _MongoDbContaBancoDigitalService.UpdateMongoDbContaBancoDigital(conta);
+            // Caso sucesso até aqui, vamos adicionar o valor para depósito sobre o saldo atual
+            contaMongoDb.Saldo += input.Valor;
 
-            return new ContaBancoDigitalPayload(conta);
+            // Por fim, vamos atualizar no a conta para o novo saldo
+            _ContaBancoDigitalRepository.UpdateMongoDbContaBancoDigital(contaMongoDb);
+
+            return new ContaBancoDigitalPayload(contaMongoDb);
         }
 
         public ContaBancoDigitalPayload SacarContaBancoDigital(ValorContaInput input)
         {
-            var contaMongoDb = _MongoDbContaBancoDigitalService.GetMongoDbContaBancoDigital(input.Conta);
+            // Busca se conta existe em banco de dados, a partir de input da API
+            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
-            var conta = new MongoDbContaBancoDigital()
+            // Caso não exista, devolve erro
+            if (contaMongoDb == null)
             {
-                Id = contaMongoDb.Id,
-                Conta = contaMongoDb.Conta,
-                Saldo = contaMongoDb.Saldo,
-            };
-
-            conta.Saldo -= input.Valor;
-
-            if (conta.Saldo < 0)
-            {
+                // Está sendo utilizado uma forma nativa de devolver erros para o usuário
+                // Apenas é necessário escolher um Código e uma Mensagem de retorno
                 throw new GraphQLException(
                     ErrorBuilder
                         .New()
-                        .SetMessage("Saldo insuficiente para esse valor de saque.")
+                        .SetMessage("Solicitação inválida - Conta inexistente.")
                         .SetCode("-1")
                         .Build());
             }
 
-            _MongoDbContaBancoDigitalService.UpdateMongoDbContaBancoDigital(conta);
+            contaMongoDb.Saldo -= input.Valor;
 
-            return new ContaBancoDigitalPayload(conta);
+            // Se resultado final for negativo, o usuário não tem saldo suficiente para realizar esse saque
+            if (contaMongoDb.Saldo < 0)
+            {
+                // Está sendo utilizado uma forma nativa de devolver erros para o usuário
+                // Apenas é necessário escolher um Código e uma Mensagem de retorno
+                throw new GraphQLException(
+                    ErrorBuilder
+                        .New()
+                        .SetMessage("Solicitação inválida - Saldo insuficiente para esse valor de saque.")
+                        .SetCode("-2")
+                        .Build());
+            }
+
+            // Por fim, vamos atualizar no a conta para o novo saldo
+            _ContaBancoDigitalRepository.UpdateMongoDbContaBancoDigital(contaMongoDb);
+
+            return new ContaBancoDigitalPayload(contaMongoDb);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace BancoDigital.Repository.MongoDBModels
+﻿namespace BancoDigital.Repository.MongoDBModels
 {
     public record CreateContaInput(
     int Conta,

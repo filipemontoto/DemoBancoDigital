@@ -4,7 +4,7 @@
     IdField = nameof(Id),
     NodeResolverType = typeof(ContaBancoDigitalResolver),
     NodeResolver = nameof(ContaBancoDigitalResolver.ResolveAsync))]
-    public class MongoDbContaBancoDigital
+    public class Contas
     {
         // Atributos da conta
         // De acordo com a necessidade do Cliente,
@@ -16,7 +16,7 @@
 
         // Se o construtor é invocado de forma padrão,
         // instancia a conta de identificador 0 e saldo 0
-        public MongoDbContaBancoDigital()
+        public Contas()
         {
             Conta = 0;
             Saldo = 0;
@@ -24,7 +24,7 @@
 
         // Se o construtor é invocado com parâmetros,
         // instancia a conta a partir dos parâmetros.
-        public MongoDbContaBancoDigital(int pConta, int pSaldo)
+        public Contas(int pConta, int pSaldo)
         {
             Conta = pConta;
             Saldo = pSaldo;

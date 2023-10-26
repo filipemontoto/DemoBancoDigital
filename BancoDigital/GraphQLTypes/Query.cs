@@ -1,9 +1,6 @@
 ﻿using BancoDigital.Interfaces;
 using BancoDigital.Repository.MongoDBModels;
-using BancoDigital.Services;
 using HotChocolate.Data;
-using MongoDB.Driver;
-using System;
 
 namespace BancoDigital.GraphQLTypes
 {

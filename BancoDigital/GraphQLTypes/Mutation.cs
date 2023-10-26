@@ -1,8 +1,4 @@
-﻿using HotChocolate.Data;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using System;
-using BancoDigital.Interfaces;
+﻿using BancoDigital.Interfaces;
 using BancoDigital.Repository.MongoDBModels;
 
 namespace BancoDigital.GraphQLTypes

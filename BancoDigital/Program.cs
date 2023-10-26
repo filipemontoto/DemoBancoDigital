@@ -1,17 +1,13 @@
 using BancoDigital.GraphQLTypes;
 using BancoDigital.Interfaces;
+using BancoDigital.Repository;
 using BancoDigital.Repository.MongoDBModels;
 using BancoDigital.Services;
-using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .Configure<MongoContaBancoDigitalSettings>(builder.Configuration.GetSection("MongoContaBancoDigital"))
-    .AddSingleton<MongoDbService>()
+    .AddSingleton<ContaBancoDigitalRepository>()
     .AddTransient<IContaBancoDigital, ContaBancoDigitalService>()
     .AddGraphQLServer()
     .AddQueryType<Query>()

@@ -1,6 +1,4 @@
-﻿using BancoDigital.Classes;
-using BancoDigital.Repository.MongoDBModels;
-using MongoDB.Driver;
+﻿using BancoDigital.Repository.MongoDBModels;
 
 namespace BancoDigital.Interfaces
 {

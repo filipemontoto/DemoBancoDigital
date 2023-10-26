@@ -1,12 +1,13 @@
 using BancoDigital.Services;
 using BancoDigital.Repository.MongoDBModels;
 using Microsoft.Extensions.Options;
+using BancoDigital.Repository;
 
 namespace TestesBancoDigital
 {
     public class TestesContaBancoDigital
     {
-        private MongoDbService _contaService;
+        private ContaBancoDigitalRepository _contaService;
 
         private ContaBancoDigitalService _service;
 
@@ -21,7 +22,7 @@ namespace TestesBancoDigital
 
             var options = Options.Create(mongoContaBancoDigitalSettings);
 
-            _contaService = new MongoDbService(options);
+            _contaService = new ContaBancoDigitalRepository(options);
             _service = new ContaBancoDigitalService(_contaService);
         }
 
@@ -136,7 +137,7 @@ namespace TestesBancoDigital
                 mensagemException = e.Message;
             }
 
-            Assert.True(mensagemException == "Saldo insuficiente para esse valor de saque.");
+            Assert.True(mensagemException == "Solicitação inválida - Saldo insuficiente para esse valor de saque.");
             #endregion
 
             #region Deleção de conta de teste
