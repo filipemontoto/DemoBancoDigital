@@ -1,4 +1,4 @@
-﻿using BancoDigital.Repository.MongoDBModels;
+﻿using BancoDigital.Repository.DbModels;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -8,7 +8,7 @@ namespace BancoDigital.Repository
     {
         private readonly IMongoCollection<Contas> _contaBancoDigitalCollection;
 
-        public ContaBancoDigitalRepository(IOptions<MongoContaBancoDigitalSettings> ContaBancoDigitalSettings)
+        public ContaBancoDigitalRepository(IOptions<ContaBancoDigitalRepositorySettings> ContaBancoDigitalSettings)
         {
             // Aplicar configurações de credenciais para acesso ao banco
             var client = new MongoClient(ContaBancoDigitalSettings.Value.ConnectionString);
@@ -29,7 +29,7 @@ namespace BancoDigital.Repository
             return null;
         }
 
-        public Contas InsertMongoDbContaBancoDigital(CreateContaInput contaInput)
+        public Contas InsertContaBancoDigital(CreateContaInput contaInput)
         {
             // Instanciar a classe que representa a tabela de contas no MongoDB
             // a partir dos dados enviados pela API
@@ -46,7 +46,7 @@ namespace BancoDigital.Repository
             return conta;
         }
 
-        public void DeleteMongoDbContaBancoDigital(Guid Id)
+        public void DeleteContaBancoDigital(Guid Id)
         {
             // A partir do Id enviado pela API, cria um filtro para deleção
             var filter = Builders<Contas>.Filter.Eq("Id", $"{Id}");
@@ -56,7 +56,7 @@ namespace BancoDigital.Repository
             _ = _contaBancoDigitalCollection.DeleteOne(filter);
         }
 
-        public void UpdateMongoDbContaBancoDigital(Contas conta)
+        public void UpdateContaBancoDigital(Contas conta)
         {
             // A partir do Id enviado pela API, cria um filtro para atualização
             var filter = Builders<Contas>.Filter.Eq("Id", $"{conta.Id}");

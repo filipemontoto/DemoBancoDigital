@@ -1,7 +1,8 @@
 using BancoDigital.Services;
-using BancoDigital.Repository.MongoDBModels;
+using BancoDigital.Repository.DbModels;
 using Microsoft.Extensions.Options;
 using BancoDigital.Repository;
+using Microsoft.Extensions.Configuration;
 
 namespace TestesBancoDigital
 {
@@ -13,17 +14,29 @@ namespace TestesBancoDigital
 
         public TestesContaBancoDigital()
         {
-            var mongoContaBancoDigitalSettings = new MongoContaBancoDigitalSettings
+            var config = InitConfiguration();
+            var repositorySettings = config.GetSection("MongoContaBancoDigital");
+
+            var contaBancoDigitalSettings = new ContaBancoDigitalRepositorySettings
             {
-                ConnectionString = "mongodb+srv://DemoFuncional:DemoFuncional@demofuncional.lukthum.mongodb.net/?retryWrites=true&w=majority",
-                DatabaseName = "BancoDigital",
-                ContaBancoDigitalCollectionName = "Contas"
+                ConnectionString = repositorySettings.GetSection("ConnectionString").Value,
+                DatabaseName = repositorySettings.GetSection("DatabaseName").Value,
+                ContaBancoDigitalCollectionName = repositorySettings.GetSection("ContaBancoDigitalCollectionName").Value
             };
 
-            var options = Options.Create(mongoContaBancoDigitalSettings);
+            var options = Options.Create(contaBancoDigitalSettings);
 
             _contaService = new ContaBancoDigitalRepository(options);
             _service = new ContaBancoDigitalService(_contaService);
+        }
+
+        public static IConfiguration InitConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+            return config;
         }
 
         [Fact]

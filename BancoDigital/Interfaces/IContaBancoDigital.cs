@@ -1,4 +1,4 @@
-﻿using BancoDigital.Repository.MongoDBModels;
+﻿using BancoDigital.Repository.DbModels;
 
 namespace BancoDigital.Interfaces
 {

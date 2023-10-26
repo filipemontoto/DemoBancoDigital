@@ -1,12 +1,12 @@
 using BancoDigital.GraphQLTypes;
 using BancoDigital.Interfaces;
 using BancoDigital.Repository;
-using BancoDigital.Repository.MongoDBModels;
+using BancoDigital.Repository.DbModels;
 using BancoDigital.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-    .Configure<MongoContaBancoDigitalSettings>(builder.Configuration.GetSection("MongoContaBancoDigital"))
+    .Configure<ContaBancoDigitalRepositorySettings>(builder.Configuration.GetSection("MongoContaBancoDigital"))
     .AddSingleton<ContaBancoDigitalRepository>()
     .AddTransient<IContaBancoDigital, ContaBancoDigitalService>()
     .AddGraphQLServer()

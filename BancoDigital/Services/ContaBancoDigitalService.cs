@@ -1,6 +1,6 @@
 ﻿using BancoDigital.Interfaces;
 using BancoDigital.Repository;
-using BancoDigital.Repository.MongoDBModels;
+using BancoDigital.Repository.DbModels;
 
 namespace BancoDigital.Services
 {
@@ -17,10 +17,10 @@ namespace BancoDigital.Services
             int conta)
         {
             // Busca se conta existe em banco de dados, a partir de input da API
-            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(conta);
+            var contaDb = _ContaBancoDigitalRepository.GetContaBancoDigital(conta);
 
             // Caso não exista, devolve erro
-            if (contaMongoDb == null)
+            if (contaDb == null)
             {
                 // Está sendo utilizado uma forma nativa de devolver erros para o usuário
                 // Apenas é necessário escolher um Código e uma Mensagem de retorno
@@ -34,34 +34,34 @@ namespace BancoDigital.Services
 
             // Caso já exista uma conta com esse código, vamos devolver a conta já criada
             // e ignorar o insert. Não queremos contas com números duplicados
-            return new SaldoPayload(contaMongoDb.Saldo);
+            return new SaldoPayload(contaDb.Saldo);
         }
 
         public ContaBancoDigitalPayload CreateContaBancoDigital(
             CreateContaInput input)
         {
             // Busca se conta existe em banco de dados, a partir de input da API
-            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
+            var contaDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, cria e devolve os dados da nova conta
-            if (contaMongoDb == null)
+            if (contaDb == null)
             {
-                return new ContaBancoDigitalPayload(_ContaBancoDigitalRepository.InsertMongoDbContaBancoDigital(input));
+                return new ContaBancoDigitalPayload(_ContaBancoDigitalRepository.InsertContaBancoDigital(input));
             }
 
             // Caso já exista uma conta com esse código, vamos devolver a conta já criada
             // e ignorar o insert. Não queremos contas com números duplicados
-            return new ContaBancoDigitalPayload(contaMongoDb);
+            return new ContaBancoDigitalPayload(contaDb);
         }
 
         public ContaBancoDigitalPayload DeletarContaBancoDigital(
             CreateContaInput input)
         {
             // Busca se conta existe em banco de dados, a partir de input da API
-            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
+            var contaDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, devolve erro
-            if (contaMongoDb == null)
+            if (contaDb == null)
             {
                 // Está sendo utilizado uma forma nativa de devolver erros para o usuário
                 // Apenas é necessário escolher um Código e uma Mensagem de retorno
@@ -74,18 +74,18 @@ namespace BancoDigital.Services
             }
 
             // Caso sucesso até aqui, só precisamos iniciar a deleção da conta, que não precisa retornar nada
-            _ContaBancoDigitalRepository.DeleteMongoDbContaBancoDigital(contaMongoDb.Id);
+            _ContaBancoDigitalRepository.DeleteContaBancoDigital(contaDb.Id);
 
-            return new ContaBancoDigitalPayload(contaMongoDb);
+            return new ContaBancoDigitalPayload(contaDb);
         }
 
         public ContaBancoDigitalPayload DepositarContaBancoDigital(ValorContaInput input)
         {
             // Busca se conta existe em banco de dados, a partir de input da API
-            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
+            var contaDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, devolve erro
-            if (contaMongoDb == null)
+            if (contaDb == null)
             {
                 // Está sendo utilizado uma forma nativa de devolver erros para o usuário
                 // Apenas é necessário escolher um Código e uma Mensagem de retorno
@@ -98,21 +98,21 @@ namespace BancoDigital.Services
             }
 
             // Caso sucesso até aqui, vamos adicionar o valor para depósito sobre o saldo atual
-            contaMongoDb.Saldo += input.Valor;
+            contaDb.Saldo += input.Valor;
 
             // Por fim, vamos atualizar no a conta para o novo saldo
-            _ContaBancoDigitalRepository.UpdateMongoDbContaBancoDigital(contaMongoDb);
+            _ContaBancoDigitalRepository.UpdateContaBancoDigital(contaDb);
 
-            return new ContaBancoDigitalPayload(contaMongoDb);
+            return new ContaBancoDigitalPayload(contaDb);
         }
 
         public ContaBancoDigitalPayload SacarContaBancoDigital(ValorContaInput input)
         {
             // Busca se conta existe em banco de dados, a partir de input da API
-            var contaMongoDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
+            var contaDb = _ContaBancoDigitalRepository.GetContaBancoDigital(input.Conta);
 
             // Caso não exista, devolve erro
-            if (contaMongoDb == null)
+            if (contaDb == null)
             {
                 // Está sendo utilizado uma forma nativa de devolver erros para o usuário
                 // Apenas é necessário escolher um Código e uma Mensagem de retorno
@@ -124,10 +124,10 @@ namespace BancoDigital.Services
                         .Build());
             }
 
-            contaMongoDb.Saldo -= input.Valor;
+            contaDb.Saldo -= input.Valor;
 
             // Se resultado final for negativo, o usuário não tem saldo suficiente para realizar esse saque
-            if (contaMongoDb.Saldo < 0)
+            if (contaDb.Saldo < 0)
             {
                 // Está sendo utilizado uma forma nativa de devolver erros para o usuário
                 // Apenas é necessário escolher um Código e uma Mensagem de retorno
@@ -140,9 +140,9 @@ namespace BancoDigital.Services
             }
 
             // Por fim, vamos atualizar no a conta para o novo saldo
-            _ContaBancoDigitalRepository.UpdateMongoDbContaBancoDigital(contaMongoDb);
+            _ContaBancoDigitalRepository.UpdateContaBancoDigital(contaDb);
 
-            return new ContaBancoDigitalPayload(contaMongoDb);
+            return new ContaBancoDigitalPayload(contaDb);
         }
     }
 }

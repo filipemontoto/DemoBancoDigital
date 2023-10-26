@@ -1,5 +1,5 @@
 ﻿using BancoDigital.Interfaces;
-using BancoDigital.Repository.MongoDBModels;
+using BancoDigital.Repository.DbModels;
 
 namespace BancoDigital.GraphQLTypes
 {

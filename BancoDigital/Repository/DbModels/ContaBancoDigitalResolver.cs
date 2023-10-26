@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace BancoDigital.Repository.MongoDBModels
+namespace BancoDigital.Repository.DbModels
 {
     public class ContaBancoDigitalResolver
     {

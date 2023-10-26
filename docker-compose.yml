@@ -1,0 +1,7 @@
+version: "3"
+services:
+    bancodigital:
+        dockerfile: Dockerfile
+        build: .
+        ports:
+          - 32925:80

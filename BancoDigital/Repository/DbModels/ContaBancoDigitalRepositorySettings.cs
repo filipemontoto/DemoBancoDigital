@@ -1,6 +1,6 @@
-﻿namespace BancoDigital.Repository.MongoDBModels
+﻿namespace BancoDigital.Repository.DbModels
 {
-    public class MongoContaBancoDigitalSettings
+    public class ContaBancoDigitalRepositorySettings
     {
         public string ConnectionString { get; set; } = null!;
 

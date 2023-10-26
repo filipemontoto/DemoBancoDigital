@@ -1,4 +1,4 @@
-﻿namespace BancoDigital.Repository.MongoDBModels
+﻿namespace BancoDigital.Repository.DbModels
 {
     [Node(
     IdField = nameof(Id),
